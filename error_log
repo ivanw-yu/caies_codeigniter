@@ -1,0 +1,13 @@
+[23-Dec-2017 08:52:41 UTC] PHP Fatal error:  Call to undefined function __() in /home/chgub4tjg3tj/public_html/wp-admin/includes/file.php on line 16
+[23-Dec-2017 08:52:42 UTC] PHP Fatal error:  Call to undefined function __() in /home/chgub4tjg3tj/public_html/wp-admin/includes/file.php on line 16
+[23-Dec-2017 08:52:42 UTC] PHP Fatal error:  Call to undefined function __() in /home/chgub4tjg3tj/public_html/wp-admin/includes/file.php on line 16
+[23-Dec-2017 08:52:42 UTC] PHP Fatal error:  Call to undefined function __() in /home/chgub4tjg3tj/public_html/wp-admin/includes/file.php on line 16
+[24-Dec-2017 08:47:01 UTC] PHP Fatal error:  Call to undefined function get_transient() in /home/chgub4tjg3tj/public_html/deleteme.wplnpe.php on line 16
+[24-Dec-2017 08:47:01 UTC] PHP Fatal error:  Call to undefined function get_transient() in /home/chgub4tjg3tj/public_html/deleteme.wpew41.php on line 16
+[24-Dec-2017 08:47:01 UTC] PHP Fatal error:  Call to undefined function get_transient() in /home/chgub4tjg3tj/public_html/deleteme.wp2fwp.php on line 16
+[24-Dec-2017 08:47:02 UTC] PHP Fatal error:  Call to undefined function get_transient() in /home/chgub4tjg3tj/public_html/deleteme.wpmfb2.php on line 16
+[24-Dec-2017 21:58:31 UTC] PHP Fatal error:  Call to a member function login() on null in /home/chgub4tjg3tj/public_html/application/controllers/Auth.php on line 89
+[24-Dec-2017 21:58:48 UTC] PHP Fatal error:  Call to a member function login() on null in /home/chgub4tjg3tj/public_html/application/controllers/Auth.php on line 89
+[24-Dec-2017 21:58:48 UTC] PHP Fatal error:  Call to a member function login() on null in /home/chgub4tjg3tj/public_html/application/controllers/Auth.php on line 89
+[24-Dec-2017 21:59:25 UTC] PHP Fatal error:  Call to a member function register() on null in /home/chgub4tjg3tj/public_html/application/controllers/Auth.php on line 59
+[24-Dec-2017 22:12:18 UTC] PHP Fatal error:  Call to a member function login() on null in /home/chgub4tjg3tj/public_html/application/controllers/Auth.php on line 89

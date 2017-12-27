@@ -1,0 +1,9 @@
+RewriteEngine on
+# Change the following when deployed! Change to public_html
+# RewriteBase /caies_codeigniter-3.1.6/
+# RewriteBase /public_html/
+RewriteBase /
+RewriteCond $1 !^(index.php|resources|robots.txt)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?/$1 [L,QSA]
