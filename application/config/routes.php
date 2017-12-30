@@ -54,13 +54,19 @@ $route['register']['post'] = 'auth/register';
 $route['news/create']['post'] = 'news/create';
 $route['news/edit/(:num)']['post'] = 'news/edit/$1';
 
+$route['questions/create']['post'] = 'questions/create';
+$route['replies/create']['post'] = 'replies/create';
+
 
 
 // $route['login'] = 'auth/login';
 $route['news/edit/(:num)'] = 'news/edit/$1';
 $route['news/create'] = 'news/create';
 $route['news/(:num)'] = 'news';
+$route['news/view/(:num)'] = 'news/view/$1';
 $route['news'] = 'news';
+$route['questions/create'] = 'questions/create';
+$route['questions'] = 'questions';
 $route['register'] = 'auth/register';
 $route['login'] = 'auth/login';
 $route['logout'] = 'auth/logout';

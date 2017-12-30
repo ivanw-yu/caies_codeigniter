@@ -59,15 +59,28 @@
         $result = $this->Auth_Model->register($member);
         if($result['success'] == true){
 
-          $_SESSION['username'] = $member["username"];
-          $_SESSION['firstName'] = $member["firstName"];
-          $_SESSION['lastName'] = $member["lastName"];
-          $_SESSION['email'] = $member["email"];
-          $_SESSION['isAdmin'] = $member["isAdmin"];
+          $this->load->model("Member_Model");
+          $user = $this->Member_Model->getByUsername($member["username"]);
+          if(!isset($user)){
+            $result["error"] = "Registration successful, but error logging in. Please try logging in later or contact CAIES admin.";
+            echo json_result($result);
+          }else{
+            if(!isset($user->id)){
+              $result["error"] = "Registration successful, but error logging in. Please try logging in later or contact CAIES admin.";
+              echo json_result($result);
+            }else{
+              $_SESSION['user'] = $user->id;
+              $_SESSION['username'] = $member["username"];
+              $_SESSION['firstName'] = $member["firstName"];
+              $_SESSION['lastName'] = $member["lastName"];
+              $_SESSION['email'] = $member["email"];
+              $_SESSION['isAdmin'] = $member["isAdmin"];
 
-          // redirect("member/dashboard", "refresh");
-          $result["url"] = base_url("dashboard");
-          echo json_encode($result);
+              // redirect("member/dashboard", "refresh");
+              $result["url"] = base_url("dashboard");
+              echo json_encode($result);
+            }
+          }
         }else{
           echo json_encode($result);
         }

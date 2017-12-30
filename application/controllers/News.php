@@ -28,20 +28,50 @@
 
       $data['news'] = $this->News_Model->getNews($config['per_page'], $startIndex);
 
-      $data['links'] = $this->pagination->initialize($config);
-      echo $this->pagination->create_links();
+      // $config['full_tag_open'] = "<div class = 'pagination'>";
+      // $config['full_tag_close'] = "</div>";
+      $config['cur_tag_open'] = '<span class = "pagination-digit pagination-active">';
+      $config['cur_tag_close'] = '</span>';
+      $config['num_tag_open'] = '<span class = "pagination-digit">';
+      $config['num_tag_close'] = '</span>';
+
+
+
+      $this->pagination->initialize($config);
+      // $data['full_tag_open'] = "<div class = 'pagination'>";
+      // $data['full_tag_close'] = "</div>";
+
+      $data['links'] = $this->pagination->create_links();
+
 
       $this->load->view("templates/header");
       $this->load->view("pages/news_listing", $data);
+      // echo $this->pagination->create_links();
       $this->load->view("templates/footer");
 
     }
 
     public function view($id = NULL){
       if(!isset($id)){
-
+        redirect("news", "refresh");
       }else{
-
+        $result = $this->News_Model->getByNewsId($id);
+        $this->load->view("templates/header");
+        if($result->membersOnly && !isset($_SESSION['user'])){
+          //$data['news'] = $result;
+          $data['message'] = "This news is for members only, please log-in to continue.";
+          $data['news_id'] = $id;
+          $this->load->view("pages/login", $data);
+        }else{
+          //$data['message'] = "Please login to view the news.";
+          $data['news'] = $result;
+          // $data['message'] = "This news is for members only, please log-in to continue.";
+          // $data['news_id'] = $id;
+          //$data['url'] = base_url('news/view/' . $id);
+          $this->load->view("pages/news_display", $data);
+        }
+        // echo $this->pagination->create_links();
+        $this->load->view("templates/footer");
       }
     }
 

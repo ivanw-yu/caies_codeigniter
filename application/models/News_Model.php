@@ -11,9 +11,9 @@ class News_Model extends CI_Model{
   public function insert($news){
     $title = $this->db->escape($news['title']);
     $content = $this->db->escape($news['content']);
-    $dateCreated = date("Y-m-d");
+    //$dateCreated = time();//date("Y-m-d");
     $type = $this->db->escape($news['type']);
-    $success = $this->db->simple_query("INSERT INTO News(authorId, title, content, dateCreated, type, membersOnly) VALUES (" . $news['authorId'] . ", " . $title . ", " . $content . ", ". $dateCreated . ", " . $type . ", " . $news['membersOnly'] . ")");
+    $success = $this->db->simple_query("INSERT INTO News(authorId, title, content, dateCreated, type, membersOnly) VALUES (" . $news['authorId'] . ", " . $title . ", " . $content . ", NOW() , " . $type . ", " . $news['membersOnly'] . ")");
     return $success;
   }
 
@@ -51,7 +51,7 @@ class News_Model extends CI_Model{
                                          . "`content` = " . $content . ", "
                                          . "`membersOnly` = " . $news['membersOnly'] . ", "
                                          . "`type` = '" . $news['type'] . "', "
-                                         . "`dateEdited` = " . date("Y-m-d")
+                                         . "`dateEdited` = NOW() "
                                          . " WHERE `id` = " . $news['id'] . ";");
    return $success;
   }
