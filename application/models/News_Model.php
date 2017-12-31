@@ -12,8 +12,9 @@ class News_Model extends CI_Model{
     $title = $this->db->escape($news['title']);
     $content = $this->db->escape($news['content']);
     //$dateCreated = time();//date("Y-m-d");
-    $type = $this->db->escape($news['type']);
-    $success = $this->db->simple_query("INSERT INTO News(authorId, title, content, dateCreated, type, membersOnly) VALUES (" . $news['authorId'] . ", " . $title . ", " . $content . ", NOW() , " . $type . ", " . $news['membersOnly'] . ")");
+    // $type = $this->db->escape($news['type']);
+    $category = $this->db->escape($news['category']);
+    $success = $this->db->simple_query("INSERT INTO News(authorId, title, content, dateCreated, membersOnly, category) VALUES (" . $news['authorId'] . ", " . $title . ", " . $content . ", NOW() , " . $news['membersOnly'] . ", " . $category . ")");
     return $success;
   }
 
@@ -32,25 +33,52 @@ class News_Model extends CI_Model{
     return $query->row();
   }
 
-  public function getNews($limit = 5, $startIndex = 0){
+  public function getNews($limit = 5, $startIndex = 0, $category = 'all', $isMember = false){
     //$startIndex = $startIndex == 0 ? 0 : $startIndex-1;
-    $result = $this->db->query("SELECT * FROM `News` ORDER BY dateCreated ASC, dateEdited ASC LIMIT " . $limit . " OFFSET " . $startIndex . " ;");
-    return $result->result();
+    if(!isset($category) || $category == 'all'){
+      if($isMember){
+        return $this->db->query("SELECT * FROM `News` ORDER BY dateCreated ASC, dateEdited ASC LIMIT " . $limit . " OFFSET " . $startIndex . " ;")->result();
+      }else{
+        return $this->db->query("SELECT * FROM `News` WHERE `membersOnly` = false ORDER BY dateCreated ASC, dateEdited ASC LIMIT " . $limit . " OFFSET " . $startIndex . " ;")->result();
+      }
+    }else{
+      if($isMember){
+        return $this->db->query("SELECT * FROM `News` WHERE `category` = " . $this->db->escape($category) . " ORDER BY dateCreated ASC, dateEdited ASC LIMIT " . $limit . " OFFSET " . $startIndex . " ;")->result();
+      }else{
+        return $this->db->query("SELECT * FROM `News` WHERE `category` = " . $this->db->escape($category) . " AND `membersOnly` = false ORDER BY dateCreated ASC, dateEdited ASC LIMIT " . $limit . " OFFSET " . $startIndex . " ;")->result();
+      }
+    }
+    //$result = $this->db->query("SELECT * FROM `News` ORDER BY dateCreated ASC, dateEdited ASC LIMIT " . $limit . " OFFSET " . $startIndex . " ;");
+    //return $result->result();
   }
 
-  public function getTotalRows(){
-    return $this->db->query("SELECT * FROM `News`;")->num_rows();
+  public function getTotalRows($category = 'all', $isMember = false){
+    if(!isset($category) || $category == 'all'){
+      if($isMember){
+        return $this->db->query("SELECT * FROM `News`;")->num_rows();
+      }else{
+        return $this->db->query("SELECT * FROM `News` WHERE `membersOnly` = false;")->num_rows();
+      }
+    }else{
+      if($isMember){
+        return $this->db->query("SELECT * FROM `News` WHERE `category` = " . $this->db->escape($category) . " ;")->num_rows();
+      }else{
+        return $this->db->query("SELECT * FROM `News` WHERE `category` = " . $this->db->escape($category) . " AND `membersOnly` = false;")->num_rows();
+      }
+    }
+
   }
 
 
   public function updateNewsById($news){
     $title = $this->db->escape($news['title']);
     $content = $this->db->escape($news['content']);
+    $category = $this->db->escape($news['category']);
     $success = $this->db->simple_query("UPDATE `News`
                                         SET `title` = " . $title . ", "
                                          . "`content` = " . $content . ", "
                                          . "`membersOnly` = " . $news['membersOnly'] . ", "
-                                         . "`type` = '" . $news['type'] . "', "
+                                         . "`category` = " . $category . ", "
                                          . "`dateEdited` = NOW() "
                                          . " WHERE `id` = " . $news['id'] . ";");
    return $success;

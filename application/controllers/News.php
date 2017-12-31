@@ -11,22 +11,28 @@
 
     public function index(){
       $this->load->library('pagination');
-
+      $category = $this->input->get('category');
+      $isMember = isset($_SESSION['user']); //? "true" : "false";
       // $config['base_url'] = 'http://example.com/index.php/news/';
       $config['use_page_numbers'] = TRUE;
       // $data['news'] = $this->News_Model->getAll();
       $config['base_url'] = base_url("news");
-      $config['total_rows'] = $this->News_Model->getTotalRows();
+      $config['total_rows'] = $this->News_Model->getTotalRows($category, $isMember);
       $config['per_page'] = 5;
 
+      $config['page_query_string'] = TRUE;
+      $config['reuse_query_string'] = TRUE; //allows other query string aside per_page.
+
       //so url goes like iexamplesite.com/news/3 ... will use 3 as pagination since it's the 2nd part of uri segment
-      $config['uri_segment'] = 2;
+      //$config['uri_segment'] = 2;
 
-      $startIndex = ($this->uri->segment(2)) ? $this->uri->segment(2) * $config['per_page'] - 1 : 0;
+      //$startIndex = ($this->uri->segment(2)) ? $this->uri->segment(2) * $config['per_page'] - 1 : 0;
+      $startIndex = $this->input->get('per_page') ? $this->input->get('per_page') * $config['per_page'] - $config['per_page'] : 0;
       // use page number instead of starting index.
-      $config['use_page_numbers'] = TRUE;
+      //$config['use_page_numbers'] = TRUE;
 
-      $data['news'] = $this->News_Model->getNews($config['per_page'], $startIndex);
+
+      $data['news'] = $this->News_Model->getNews($config['per_page'], $startIndex, $category, $isMember);
 
       // $config['full_tag_open'] = "<div class = 'pagination'>";
       // $config['full_tag_close'] = "</div>";
@@ -34,6 +40,8 @@
       $config['cur_tag_close'] = '</span>';
       $config['num_tag_open'] = '<span class = "pagination-digit">';
       $config['num_tag_close'] = '</span>';
+
+
 
 
 
@@ -88,7 +96,8 @@
             "title" => $_POST['title'],
             "content" => $_POST['content'],
             "type" => isset($_POST['type']) ? $_POST['type'] : 'Event',
-            "membersOnly" => isset($_POST['membersOnly']) ? $_POST['membersOnly'] : 'false'
+            "membersOnly" => isset($_POST['membersOnly']) ? $_POST['membersOnly'] : 'false',
+            "category" => isset($_POST['category']) ? $_POST['category'] : 'others'
           );
           $success = $this->News_Model->insert($news);
           $jsonResponse["success"] = $success;
@@ -113,7 +122,8 @@
           "title" => $_POST['title'],
           "content" => $_POST['content'],
           "type" => isset($_POST['type']) ? $_POST['type'] : 'Event',
-          "membersOnly" => isset($_POST['membersOnly']) ? $_POST['membersOnly'] : 'false'
+          "membersOnly" => isset($_POST['membersOnly']) ? $_POST['membersOnly'] : 'false',
+          "category" => $_POST['category']
         );
 
         $jsonResponse = [];

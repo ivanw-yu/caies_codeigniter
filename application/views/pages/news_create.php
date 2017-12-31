@@ -11,7 +11,14 @@
     <textarea name = "content" class = "form-control" rows="5"> <?php if(isset($news)){echo $news->content; } ?></textarea>
     </div>
     <label for = "membersOnly">Members Only</label>
-    <input id = "membersOnly" name = "membersOnly" type = "checkbox">
+    <input id = "membersOnly" name = "membersOnly" type = "checkbox" <?php if(isset($news) && $news->membersOnly){ echo "checked"; }else{ echo ''; } ?> >
+    <br>
+    <label for = "category">Category</label>
+    <select id = "category" name = "category">
+      <option value = "others"> Others </option>
+      <option value = "events">Events</option>
+      <option value = "opportunities">Opportunities </option>
+    </select>
     <br>
     <?php if(!isset($news)){ ?>
       <input id = "submitButton" type = "submit" value = "Submit" class = "btn btn-primary">
@@ -27,11 +34,20 @@
 <br><br><br>
 <script>
 
+  $("#category").val("<?php if(isset($news)){ echo $news->category; }else{ echo "others"; } ?>");
+
   $("#saveEditButton").on('click', function(event){
   // function saveEdit(id){
     console.log($('#news-create-form').serialize());
+    if($("#membersOnly").val() == "on"){
+      $("#membersOnly").val(true);
+      console.log($("#membersOnly").val());
+    }else{
+      $("#membersOnly").val(false);
+      console.log($("#membersOnly").val());
+    }
     $.ajax({
-        url: 'news/edit/' + "<?php echo $news->id; ?>",
+        url: 'news/edit/' + "<?php echo isset($news->id) ? $news->id : ''; ?>",
         type: 'post',
         data: $('#news-create-form').serialize(),
         success: function(serverResponse){
@@ -53,7 +69,7 @@
 
     console.log($('#news-create-form').serialize());
     console.log($("#membersOnly").val());
-    var membersOnly
+
     if($("#membersOnly").val() == "on"){
       $("#membersOnly").val(true);
       console.log($("#membersOnly").val());
