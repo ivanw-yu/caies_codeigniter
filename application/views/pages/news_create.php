@@ -15,7 +15,7 @@
       <button id = "editMode" style = "float: right">Edit Mode</button>
       <button id = "viewMode" style = "float: right">View Mode</button>
     </div>
-    <div id = "divTextArea"><!-- contenteditable = "true">-->abcd</div>
+    <div id = "divTextArea" contenteditable="true"></div>
     <!--style = "display: none">-->
     <textarea id = "content" name = "content" class = "form-control" rows="5" > <?php if(isset($news)){echo $news->content; } ?></textarea>
     </div>
@@ -55,6 +55,7 @@
     //var textarea = document.getElementById("content");
     textarea.focus();
     textarea.selectionEnd= newCursorPosition;
+    textarea.selectionStart = newCursorPosition;
   }
 
   function insideMarkup(textarea, markup, cursorPosition){
@@ -83,10 +84,15 @@
     }
   }
 
-  function insideCurrentMarkup(textarea, cursorPointer){
+  function deleteEmptyMarkup(textarea, markup){
+    textarea.value = textarea.value.replace(new RegExp("<" + markup + ">[\\s]*" + "</" + markup + ">", "g"), "");
+  }
 
+  function insideCurrentMarkup(textarea, cursorPosition){
+
+    console.log("cursorPointer at insideCurrentMarkup: ", cursorPosition);
     for(var i = 0; i < appliedMarkups.length; i++){
-          if(!insideMarkup(textarea, appliedMarkups[i], cursorPointer)){
+          if(!insideMarkup(textarea, appliedMarkups[i], cursorPosition)){
             console.log(false);
             return false;
           }
@@ -107,6 +113,53 @@
       appliedMarkups.push(markup);
   }
 
+  // if some markups are applied, move to the applied markups if the cursor is not in them.
+  function moveCursorToAppliedMarkups(textArea, cursorPosition){
+    console.log("inside moveCursor", textArea.selectionEnd, textArea.selectionStart, textArea.value);
+    if(!insideCurrentMarkup(textArea, cursorPosition) && appliedMarkups.length > 0){
+
+        var text = textArea.value;
+        var markupStartTags = "", markupEndTags = "";
+        for(var i = 0; i < appliedMarkups.length; i++){
+          markupStartTags += "<" + appliedMarkups[i] + ">";
+        }
+        appliedMarkups.reverse();
+        for(var i = 0; i < appliedMarkups.length; i++){
+          markupEndTags += "</" + appliedMarkups[i] + ">";
+        }
+        appliedMarkups.reverse();
+
+        // check if cursor is before the tags, if it is, move it to after that tag.
+        var substringStartingAtCursor = text.substring(cursorPosition);
+        //console.log("substringStartingAtCursor: ", substringStartingAtCursor);
+        var indexClosestStartTags = substringStartingAtCursor.indexOf(markupStartTags);
+        console.log("substringStartingAtCursor: ", substringStartingAtCursor, ", index: ", indexClosestStartTags);
+        if(cursorPosition <= indexClosestStartTags && false){
+          textArea.selectionEnd = cursorPosition + (cursorPosition - indexClosestStartTags) + markupStartTags.length;
+          textArea.selectionStart = cursorPosition + (cursorPosition - indexClosestStartTags) + markupStartTags.length;
+          console.log("new position: ", textArea.selectionEnd);
+          return;
+        }
+
+        var substringUntilCursor = text.substring(0, cursorPosition);
+        var indexClosestEndTags = substringUntilCursor.lastIndexOf(markupEndTags);
+        if(cursorPosition > indexClosestEndTags){
+          textArea.selectionEnd = indexClosestEndTags;
+          textArea.selectionStart = indexClosestEndTags;
+          console.log(textArea.selectionEnd);
+          return;
+        }
+
+
+
+        // check if cursor is after the end tag, if it is, move it before the end tag.
+        var indexEndTags = text.indexOf(markupEndTags);
+
+    }else{
+      console.log("applied markup length is 0 or is inside applied markups");
+    }
+  }
+
   function removeConsecutiveTags(textarea, appliedMarkups, cursorPosition){
     var text = textarea.value;
     //var markupArray = appliedMarkups;
@@ -116,22 +169,36 @@
     appliedMarkups.reverse();
     console.log(startTags);
     console.log(endTags);
+    var cursorMove = 0;
     var tagsWithSpaceInBetweenRegex = new RegExp(endTags + "[\\s]*"+ startTags, "g");
     console.log("regex: " + tagsWithSpaceInBetweenRegex);
+    //if(tagsWithSpaceInBetweenRegex.test(text)){
+      //var matchingStringArray = text.match(tagsWithSpaceInBetweenRegex);
+    console.log("before: ", textarea.value, ", cursor: ", textarea.selectionEnd, textarea.selectionStart);
     var noConsecutives = text.replace(tagsWithSpaceInBetweenRegex, "");
-
+      //cursorMove += endTags
+    //}
     console.log("no consec: ", noConsecutives);
-    // for(var i = 0; i< appliedMarkups.length; i++){
-    //   var nextRegex = new RegExp("</" + appliedMarkups[i] + ">[\\s]*<" + appliedMarkups[i] + ">", "g");
-    //   if(nextRegex.test(noConsecutives)){
-    //     noConsecutives = noConsecutives.replace(nextRegex, "");
-    //     console.log("nextRegex true: ", nextRegex);
-    //     i = (i>0) ? 0 : i;
-    //   }
-    // }
+
+    //!!!@@!@!@!@@!!@CONTINUE HERE, MUST REPLACE THINGS LIKE </i><i> single consecutive end tags.
+    for(var i = 0; i< appliedMarkups.length; i++){
+      var nextRegex = new RegExp("(</" + appliedMarkups[i] + ">[\\s]*<" + appliedMarkups[i] + ">)|(</" + appliedMarkups[i] + "><"+ appliedMarkups[i] + ">)", "g");
+      if(nextRegex.test(noConsecutives)){
+        noConsecutives = noConsecutives.replace(nextRegex, "");
+        console.log("noConsec after ", nextRegex , " removed: ", noConsecutives);
+        cursorMove += appliedMarkups.length;
+        // textarea.selectionEnd -=
+        //console.log("nextRegex true: ", nextRegex);
+        i = (i>0) ? 0 : i;
+      }
+      console.log("nextRegex false: ", nextRegex, " | noConsecutives: ", noConsecutives);
+    }
+    // textarea.selectionEnd = cursorPointer -
     console.log("no consec2: ", noConsecutives);
     console.log("markup array: ", appliedMarkups);
+    console.log("cursor pos in removeConsecutiveTags", textarea.selectionEnd, textarea.selectionStart);
     textarea.value = noConsecutives;
+    moveCursorToAppliedMarkups(textarea, textarea.selectionEnd);
   }
 
   $("#editMode").addClass("news-button-active");
@@ -154,17 +221,20 @@
   // $("#content").on('focus', function(){
     $("#content").on('click', function(){
       var cursorPosition = $('#content').prop("selectionStart");
-      if(!insideCurrentMarkup(newsTextarea,cursorPosition)){
+      if(!insideCurrentMarkup(newsTextarea,cursorPosition) && appliedMarkups.length > 0){
         var cursorPosition = $('#content').prop("selectionStart");
         for(var i = 0; i < appliedMarkups.length; i++){
           // only add new tag if it's not already inside the same tag.
           if(!insideMarkup(newsTextarea, appliedMarkups[i], cursorPosition)){
             insertMarkup(newsTextarea,appliedMarkups[i], cursorPosition);
             cursorPosition = cursorPosition + ("<" + appliedMarkups[i] + ">").length;
-            removeConsecutiveTags(newsTextarea, appliedMarkups, cursorPosition);
           }
+
           console.log("here");
         }
+
+        removeConsecutiveTags(newsTextarea, appliedMarkups, cursorPosition);
+
       }
       //if()
       //console.log(insideMarkup(newsTextarea, "b", cursorPosition));

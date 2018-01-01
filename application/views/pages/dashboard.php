@@ -10,7 +10,8 @@
   <div id = "dashboard-news">
     <h1> News </h1>
     <div class = "content-top">
-      <button><a href = "news/create"><div class = "glyphicon glyphicon-plus"></div></a></button>
+      <!-- <button><a href = "news/create"><div class = "glyphicon glyphicon-plus"></div></a></button> -->
+      <button class = "glyphicon glyphicon-plus" onclick = "window.location.href = 'news/create';"></button>
     </div>
     <div class = "scroll-content">
       <?php foreach($news as $news_item): ?>
